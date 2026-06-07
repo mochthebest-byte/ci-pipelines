@@ -138,7 +138,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ inputs.ecr_repository }}
-          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+          IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
         run: |
           echo "Building ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
 
@@ -174,7 +174,7 @@ jobs:
       - name: Update image tag in k8s manifest
         env:
           SERVICE_NAME: ${{ inputs.service_name }}
-          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+          IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
           ECR_REGISTRY: ${{ needs.build-and-push.outputs.ecr_registry }}
           ECR_REPOSITORY: ${{ inputs.ecr_repository }}
           MANIFEST_PATH: ${{ inputs.gitops_manifest_path || format('apps/{0}/deployment.yaml', inputs.service_name) }}
@@ -224,4 +224,4 @@ jobs:
           Automated by CI pipeline (GitHub Actions OIDC)."
           git push origin ${{ inputs.gitops_branch }}
 
-          echo "✅ Pushed to ${{ inputs.gitops_repo }}:${{ inputs.gitops_branch }}"
+          echo "✅ Pushed to ${GITOPS_REPO}:${GITOPS_BRANCH}"
