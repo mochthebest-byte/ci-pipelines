@@ -1,0 +1,17 @@
+name: Test Descriptions
+on:
+  workflow_call:
+    inputs:
+      name:
+        description: "A name parameter"
+        required: true
+        type: string
+
+env:
+  GREETING: "Hello ${{ inputs.name }}"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ env.GREETING }}"
