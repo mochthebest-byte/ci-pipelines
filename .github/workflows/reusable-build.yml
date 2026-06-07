@@ -224,4 +224,4 @@ jobs:
           Automated by CI pipeline (GitHub Actions OIDC)."
           git push origin ${{ inputs.gitops_branch }}
 
-          echo "✅ Pushed to ${GITOPS_REPO}:${GITOPS_BRANCH}"
+          echo "✅ Pushed to ${{ inputs.gitops_repo }}:${{ inputs.gitops_branch }}"
