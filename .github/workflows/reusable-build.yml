@@ -132,7 +132,11 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # ── 4. Build та Push Docker образу ──────────────
+      # ── 4. Setup Docker Buildx (multi-arch) ──────────
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── 5. Build та Push Docker образу (multi-arch) ───
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -142,14 +146,13 @@ jobs:
         run: |
           echo "Building ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
 
-          # Build (з контекстом ${{ inputs.docker_context }})
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-                       -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-                       "${{ inputs.docker_context }}"
-
-          # Push
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          # Buildx multi-arch: amd64 + arm64 у одному шоті
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            --push \
+            "${{ inputs.docker_context }}"
 
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
           echo "registry=$ECR_REGISTRY" >> $GITHUB_OUTPUT
