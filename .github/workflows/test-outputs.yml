@@ -1,0 +1,22 @@
+name: Test Outputs
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+
+jobs:
+  first:
+    runs-on: ubuntu-latest
+    outputs:
+      message: ${{ steps.hello.outputs.message }}
+    steps:
+      - id: hello
+        run: echo "message=Hello ${{ inputs.name }}" >> $GITHUB_OUTPUT
+
+  second:
+    runs-on: ubuntu-latest
+    needs: first
+    steps:
+      - run: echo "${{ needs.first.outputs.message }}"
